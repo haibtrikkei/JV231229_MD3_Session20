@@ -17,7 +17,6 @@ import java.util.Set;
 import org.mindrot.jbcrypt.BCrypt;
 
 @Repository
-@EnableTransactionManagement
 public class UserDAOImpl implements UserDAO {
     @Autowired
     private SessionFactory sessionFactory;
@@ -25,33 +24,47 @@ public class UserDAOImpl implements UserDAO {
     private RoleDAO roleDAO;
 
     @Override
-    @Transactional
     public boolean saveUser(User user) {
         Session session = sessionFactory.openSession();
         try{
-            Role role = roleDAO.getRoleByRoleName(RoleName.ROLE_USER.toString());
+            session.beginTransaction();
+            Role roleUser = roleDAO.getRoleByRoleName(RoleName.ROLE_USER.toString());
+            Role roleAdmin = roleDAO.getRoleByRoleName(RoleName.ROLE_ADMIN.toString());
             Set<Role> roles = new HashSet<>();
-            roles.add(role);
+            roles.add(roleUser);
+            roles.add(roleAdmin);
             user.setRoleSet(roles);
             user.setPassword(BCrypt.hashpw(user.getPassword(),BCrypt.gensalt(12)));
             session.save(user);
+            session.getTransaction().commit();
             return true;
         }catch (Exception e){
             e.printStackTrace();
+            session.getTransaction().rollback();
+        }finally {
+            session.close();
         }
         return false;
     }
 
     @Override
-    public User getUserByUserNameAndPass(String username, String password) {
+    public User getUserByUserName(String username) {
         Session session = sessionFactory.openSession();
         try {
-
+            User user = session.createQuery("from User  where  username=:username", User.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
+            return user;
         }catch (Exception e) {
             e.printStackTrace();
         }finally {
             session.close();
         }
         return null;
+    }
+
+    @Override
+    public boolean checkPasswordUser(User user, String password) {
+        return user.getPassword().equals(BCrypt.hashpw(password,BCrypt.gensalt(12)));
     }
 }

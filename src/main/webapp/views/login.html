@@ -11,15 +11,15 @@
         <table class="table table-bordered">
             <tr>
                 <td>User name:</td>
-                <td><input type="text" th:field="*{username}"></td>
+                <td><input type="text" th:field="*{username}" value="${cookie.username.value}"></td>
             </tr>
             <tr>
                 <td>Password:</td>
-                <td><input type="password" th:field="*{password}"></td>
+                <td><input type="password" th:field="*{password}" value="${cookie.password.value}"></td>
             </tr>
             <tr>
                 <td></td>
-                <td><input type="checkbox" th:field="*{save}" value="save">Save</td>
+                <td><input type="checkbox" th:field="*{save}" value="save" ${cookie.save.value}>Save</td>
             </tr>
             <tr>
                 <td></td>

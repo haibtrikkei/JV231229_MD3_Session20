@@ -22,12 +22,12 @@ import java.io.File;
 import java.io.IOException;
 
 @Controller
-@RequestMapping(value = {"/","/user"})
+@RequestMapping(value = {"/user"})
 public class UserController {
     @Autowired
     private UserDAO userDAO;
 
-    @RequestMapping(value = {"/","/register"})
+    @RequestMapping(value = {"/register"})
     public String register(Model model){
         User user = new User();
         model.addAttribute("user",user);
@@ -60,7 +60,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/login",method = RequestMethod.GET)
+    @RequestMapping(value = {"/","/login"},method = RequestMethod.GET)
     public String initLogin(Model model){
         LoginForm obj = new LoginForm();
         model.addAttribute("obj",obj);
@@ -102,9 +102,9 @@ public class UserController {
     }
 
     @RequestMapping("/logout")
-    public String logout(HttpSession session){
+    public String logout(HttpSession session, Model model){
         session.invalidate();
-        return "login";
+        return "redirect:/user/login";
     }
 
 }
